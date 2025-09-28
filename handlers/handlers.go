@@ -28,6 +28,7 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
 
+	// クエリパラメータpageを取得
 	var page int
 	if p, ok := queryMap["page"]; ok && len(p) > 0 {
 		var err error
@@ -40,8 +41,14 @@ func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 		page = 1
 	}
 
-	resString := fmt.Sprintf("Article List (page %d)\n", page)
-	io.WriteString(w, resString)
+	articles := []models.Article{models.Article1, models.Article2}
+	jsonData, err := json.Marshal(articles)
+	if err != nil {
+		errMsg := fmt.Sprintf("fail to encode json (page %d)\n", page)
+		http.Error(w, errMsg, http.StatusInternalServerError)
+	}
+
+	w.Write(jsonData)
 }
 
 func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
@@ -50,14 +57,34 @@ func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 		return
 	}
-	resString := fmt.Sprintf("Article No.%d\n", articleID)
-	io.WriteString(w, resString)
+
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		errMsg := fmt.Sprintf("fail to encode json (articleID %d)\n", articleID)
+		http.Error(w, errMsg, http.StatusInternalServerError)
+	}
+
+	w.Write(jsonData)
+
 }
 
 func PostNiceHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Nice...\n")
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "fail to encode json\n", http.StatusInternalServerError)
+	}
+
+	w.Write(jsonData)
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting Comment...\n")
+	comment := models.Comment1
+	jsonData, err := json.Marshal(comment)
+	if err != nil {
+		http.Error(w, "fail to encode json\n", http.StatusInternalServerError)
+	}
+
+	w.Write(jsonData)
 }
